@@ -1,13 +1,3 @@
-Pidä omaa lopputyöpäiväkirjaa esimerkiksi tiedostossa lopputyo/muistiinpanot.md. Kirjaa jokaisesta moduulista:
-
-    mitä päätit
-    mitä ajoit
-    mikä tulos tai havainto syntyi
-    mikä jäi epävarmaksi
-    mitä muutat seuraavaksi
-
-Jos oma aineisto ei vielä ole valmiina, tee moduulin oma harjoitus kurssin pienellä esimerkkidatalla ja kirjaa, miten sama vaihe tehtäisiin omalle aineistolle myöhemmin
-
 # Lopputyö
 
 ## Alustava tapauskansio
@@ -19,7 +9,47 @@ Normaalia dataa voisi olla tavalliset verkkoliikenteen toiminnot, kuten käyttä
 
 Verkkoliikenteessä pisteanomalia saattaisi olla erikoinen ftp kirjautumisyritys tai suuri pakettimäärä. Kontekstuaalinen anomalia saattaisi taas olla useampi yllättävä ftp kirjautumisyritys etenkin, jos FTP ei ole käytössä kohdejärjestelmissä. Kollektiivisia anomalioita voi esiintyä verkkoliikenteen seassa, sillä aineistossa yksittäinen lokimerkintä ei saata itsessään nostaa hälytystä, kun taas kokoelma poikkeuksia voisi olla huomionarvoista. Tässä työssä käytämme termiä havainto yksittäisestä lokimerkinnästä.
 
+UNSW-SB15 aineiston havaintoyksikkö on verkkoliikennetapahtuma/lokimerkintä verkkoliikenteestä. Aineistossa normaalia käyttäytymistä voi olla toisinaan hankala erottaa anomaliasta ilman laajempaa kontekstia, mutta joitakin asioita kannattaa havaita: käytetty protokolla/palvelu ja kättelyvaihe, lähetysnopeus, lähetettyjen ja vastaanotettujen pakettien suuruus sekä määrä. Normaalisti näiden arvot ovat oletettujen arvojen sisällä, eikä esimerkiksi lähetettyjen tavujen määrä ole valtava. Eräs poikkeama voisi olla huomattavan suuri lähetettyjen tavujen määrä. Toinen poikkeama voisi olla liian tasaiset lukemat esimerkiksi lähetettyjen bittien lähetyskuormassa ja lähetysnopeudessa. Esimerkkinä tällaisesta havainnosta olisi lähetysnopeus (rate) 111111.1 ja vastaava lähetyskuorma (sload) 88888888. Koska aineistosta löytyy valmiit label-arvot, voidaan asetelmaksi ottaa alustavasti ohjattu anomalian havaitseminen. Aineistossa on runsaasti merkittyä poikkeamadataa, kuten myös normaalia käyttäytymistä.
+
 ### 02 Datatyypit ja datamatriisi
 
-Tässä lopputyössä alustavana aineistona on siis UNSW-NB15 datasetti, jossa on synteettistä verkkoliikennettä kategorisoituna tunnistettuihin hyökkäyksiin tai normaaliin liikenteeseen. Vaihtoehtoisena aineistona voisi olla KDD Cup 1999 10 percent.  UNSW-NB15 aineiston viitteet löytyvät tämän kansion README.md tiedostosta. Test CSV on noin 15MB ja training CSV noin 32MB. Aineisto on akateemisessa käytössä vapaasti hyödynnettävissä, kun alkuperäisiin artikkeleihin viitataan oikeaoppisesti. Aineiston tärkeimpiä sarakkeita ovat kesto (dur), protokolla (proto), palvelu (service), lähettäjän ja kohteen tavut (sbytes, dbytes) sekä pakettinopeus (rate). Sarakkeita on kymmeniä kappaleita, joista osa on tärkeämpiä kuin toiset. Edellä mainitut ovat mielekkäimpiä tutkia yksittäisten havaintojen kohdalta, mutta muut sarakkeet tarjoavat niin ikään hyödyllistä tietoa. Aineistossa on olemassa valmiit label-arvot. Label kertoo, onko havainto poikkeava/anomalia binäärisesti ja attack_cat kertoo valmiiksi havaitun hyökkäysluokan. 
+Tässä lopputyössä alustavana aineistona on UNSW-NB15 datasetti, jossa on synteettistä verkkoliikennettä kategorisoituna tunnistettuihin hyökkäyksiin tai normaaliin liikenteeseen. Vaihtoehtoisena aineistona voisi olla KDD Cup 1999 10 percent. UNSW-NB15 aineiston viitteet löytyvät tämän kansion README.md tiedostosta. Test CSV on noin 15MB ja training CSV noin 32MB. Aineistosta on löydettävissä myös datamatriisin piirteet selitettyinä, kuten myös havaitut poikkeamat listassa.  Aineisto on akateemisessa käytössä vapaasti hyödynnettävissä, kun alkuperäisiin artikkeleihin viitataan oikeaoppisesti. Aineiston tärkeimpiä sarakkeita ovat kesto (dur), protokolla (proto), palvelu (service), lähettäjän ja kohteen tavut (sbytes, dbytes) sekä pakettinopeus (rate). Sarakkeita on kymmeniä kappaleita, joista osa on tärkeämpiä kuin toiset. Edellä mainitut ovat mielekkäimpiä tutkia yksittäisten havaintojen kohdalta, mutta muut sarakkeet tarjoavat niin ikään hyödyllistä tietoa. Aineistossa on olemassa valmiit label-arvot. Label kertoo, onko havainto poikkeava/anomalia binäärisesti ja attack_cat kertoo valmiiksi havaitun hyökkäysluokan. 
+
+## 03 Esikäsittely ja skaalaus
+
+Aineiston numeeriset piirteet:
+- Kesto (dur)
+- Lähetetyt paketit (spkts, dpkts)
+- Lähetetyt tavut (sbytes, dbytes)
+- Lähetysnopeus (rate)
+- Lähetysten time-to-live (sttl, dttl)
+- Lähetysten bittitahti (sload, dload)
+- Pudotetut ja uudelleen lähetetyt paketit (sloss, dloss)
+
+Kategoriset piirteet:
+- Protokolla (proto)
+- Palvelu (service)
+- Vaihe (state)
+
+Puuttuvat arvot:
+- Palvelun arvo puuttuu usein.
+
+Aikaleimat:
+- Aikaleimoja ei ole, mutta tunnusluku (id) voidaan tulkita aikajärjestykseksi.
+
+Numeeristen piirteiden arvot vaihtelevat merkittävästi. Lähetetyt tavut eroavat merkittävästi esimerkiksi lähetetyistä paketeista, joten näitä tulee skaalata lähemmäksi toisiaan. Protokolla, palvelu ja vaihe tulee koodata jollakin tarkoituksenmukaisella esitystavalla. Näiden arvoja ei voi asettaa järjestykseen mielekkäällä tavalla. Mallista jätetään pois attack_cat ja label, jotka eivät kuulu syötearvoiksi. 
+
+### Esikäsittelysuunnitelma
+
+1. Skaalataan aineiston numeeriset piirteet siten, että niiden arvojen eroavaisuudet eivät vaikuta merkittävästi tulkintaan mahdollisista poikkeamista. Taustalla päätöksessä on merkittävät eroavaisuudet arvojen mittakaavoissa.
+
+2. Skaalataan kategoriset piirteet tarkoituksenmukaisesti esimerkiksi one-hot-koodauksella. Protokolla voidaan esimerkiksi one-hot-koodata siten, että yksittäinen protokolla saa oman binäärisen arvon saavan sarakkeen. Kategoristen piirteiden esikäsittelyssä on muistettava, ettei niitä tule esittää suoraan numeerisin arvoin
+
+3. attack_cat ja label piirteet jätetään käsittelyn ulkopuolelle, eikä niitä käytetä syötearvoina. 
+
+4. Palvelun arvo puuttuu usein, minkä vuoksi se ei välttämättä ole mielekäs piirre hyödyntää anomalian havaitsemisessa. Puuttumisella
+viitataan merkkijonoarvoon "-", joka voidaan tulkita puuttuvana.
+Aineistosta ei löydy null-arvoja lainkaan. 
+
+skriptit/esikasittely_tarkistus.py sisältää tarkistuksen, joka selvittää datan muodon, puuttuvien arvojen määrän ja numeeristen sarakkeiden minimi- ja maksimiarvot.
 
