@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-df = pd.read_csv('aineisto/CSV Files/Training and Testing Sets/UNSW_NB15_testing-set.csv');
+df = pd.read_csv('aineisto/CSV Files/Training and Testing Sets/UNSW_NB15_training-set.csv');
 print("Datan muoto:\n\n", df.shape);
 print("")
 print("--------------------------------------")
