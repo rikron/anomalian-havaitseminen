@@ -15,7 +15,7 @@ UNSW-SB15 aineiston havaintoyksikkö on verkkoliikennetapahtuma/lokimerkintä ve
 
 Tässä lopputyössä alustavana aineistona on UNSW-NB15 datasetti, jossa on synteettistä verkkoliikennettä kategorisoituna tunnistettuihin hyökkäyksiin tai normaaliin liikenteeseen. Vaihtoehtoisena aineistona voisi olla KDD Cup 1999 10 percent. UNSW-NB15 aineiston viitteet löytyvät tämän kansion README.md tiedostosta. Test CSV on noin 15MB ja training CSV noin 32MB. Aineistosta on löydettävissä myös datamatriisin piirteet selitettyinä, kuten myös havaitut poikkeamat listassa.  Aineisto on akateemisessa käytössä vapaasti hyödynnettävissä, kun alkuperäisiin artikkeleihin viitataan oikeaoppisesti. Aineiston tärkeimpiä sarakkeita ovat kesto (dur), protokolla (proto), palvelu (service), lähettäjän ja kohteen tavut (sbytes, dbytes) sekä pakettinopeus (rate). Sarakkeita on kymmeniä kappaleita, joista osa on tärkeämpiä kuin toiset. Edellä mainitut ovat mielekkäimpiä tutkia yksittäisten havaintojen kohdalta, mutta muut sarakkeet tarjoavat niin ikään hyödyllistä tietoa. Aineistossa on olemassa valmiit label-arvot. Label kertoo, onko havainto poikkeava/anomalia binäärisesti ja attack_cat kertoo valmiiksi havaitun hyökkäysluokan. 
 
-## 03 Esikäsittely ja skaalaus
+### 03 Esikäsittely ja skaalaus
 
 Aineiston numeeriset piirteet:
 - Kesto (dur)
@@ -53,15 +53,15 @@ Aineistosta ei löydy null-arvoja lainkaan.
 
 skriptit/esikasittely_tarkistus.py sisältää tarkistuksen, joka selvittää datan muodon, puuttuvien arvojen määrän ja numeeristen sarakkeiden minimi- ja maksimiarvot.
 
-## 04 Lineaarialgebran minimi
+### 04 Lineaarialgebran minimi
 
 Datamatriisina tulkittuna UNSW-NB15 aineiston matriisin koko n x p on (82332, 45). Rivit ovat havaintoja ja sarakkeet ovat piirteitä. Transpoosi voisi olla hyödyllistä, jos haluamme vertailla piirteiden saamia arvoja keskenään. Piirrevektoreita voisi hyödyntää kyseisen aineiston analysoinnissa laskennan nopeuttamiseksi, kun vektorille voidaan tehdä operaatioita ilman tarvetta laskea kaikkia havaintoja yksi kerrallaan läpi. Matriisituloa voidaan myös hyödyntää laskennan tehostamiseksi. Myös esimerkiksi neuroverkoissa hyödynnetään matriisituloja.
 
-## 05 Kovarianssi
+### 05 Kovarianssi
 
 Skriptit kansiosta löytyvä kovarianssi.py tiedosto sisältää Python skriptin, jolla voidaan laskea koko aineiston kovarianssi sarakkeittain. Skripti luo kovarianssi.csv tiedoston, josta löytyy matriisi sarakkeiden kovarianssista. Kovarianssista voi päätellä, että arvon ollessa positiivinen, muuttujat ovat usein keskiarvonsa ylä- tai alapuolella. Negatiivinen kovarianssi tarkoittaa, että toinen on usein yläpuolella, kun toinen on vastaavasti alhaalla. Datasta on hankala päätellä mitään, sillä dataa ei ole vielä skaalattu. Skaalaus on tehtävä uudestaan ennen kovarianssin laskentaa.
 
-## 06 Etäisyydet ja tilastolliset pisteet
+### 06 Etäisyydet ja tilastolliset pisteet
 
 Tässä vaiheessa on hyvä skaalata aineisto. skaalaus.py tiedosto sisältää tarvittavat skaalaukset, kuten one-hot-koodaukset kategorisille muuttujille, sekä robusti skaalaus numeerisille arvoille. Samalla aineistosta pudotetaan pois id, attack_cat ja label.
 
@@ -77,13 +77,58 @@ UNSW-NB15 aineistosta voidaan laskea Mahalanobis-etäisyys eri piirteiden yhteis
 
 Mahalanobis-etäisyyden kaava vertaa etäisyyttä aineiston pisteiden jakauman välillä, kun piirteet korreloituvat jotenkin. Maksimeista ei voida vielä todeta merkittävää anomaliaa ilman laajempaa kontekstia datan muodosta ja sen poikkeamien muodosta. On kuitenkin tärkeää tarkastaa ylläolevat maksimit, sillä niiden etäisyys poikkeaa suurimmasta osasta etäisyyksistä.
 
-## 07 Arviointi ja metriikat
+### 07 Arviointi ja metriikat
 
 Voimme hyödyntää arvioinnissa precision ja recall arvoja. Valmiit label-arvot tarjoavat mahdollisuuden laskea TP, TN, FP ja FN lukumäärät. 
 
-![alt text](image.png)
+![accuracy, precision ja recall](image.png)
 Aineistosta löytyvät label-arvot toimivat erinomaisena työkaluna tulosten tarkastukseen. Binäärinen normaali/anomalia tilastointi voidaan toteuttaa melko luotettavasti. Accuracy ei ole aina luotettavin metriikka anomalian havaitsemisessa, sillä korkea accuracy saattaa silti sisältää kymmeniä tai satoja havaitsemattomia anomalioita. Tuloksia on tarkasteltava myös recall- ja,precision-arvojen  mukaisesti
 
-## 08 Kynnys ja virheanalyysi
+### 08 Kynnys ja virheanalyysi
 
 Tietoliikenteen tapauksessa analyysissä kalliimmaksi saattaisivat tulla väärät negatiiviset, jolloin todellinen anomalia jäisi huomaamatta. Hälytyksien tarkastaminen voi toki tulla kalliiksi riippuen tavasta tarkastaa. Jos valvoja tarkastaa ne manuaalisesti, saattaa olla järkevää kohottaa kynnystä.
+
+### 09 Least squares ajattelu
+
+sbytes on muuttujana ennustettavissa aineiston muiden piirteiden perusteella. Esimerkiksi spkts selittää sbytes liikehdintää ja sen  suuntaa, kuten myös rate ja dur yhdessä. 
+
+Voimme hyödyntää aineistossa residuaalibaselinea, sillä esimerkiksi sbytes on ennustettava muuttuja aineistossa. Ajamalla pienen Python skriptin skriptit\least_squares.py, voimme verrata dur ja sbytes piirteitä ja havaita suuria residuaaleja.
+
+Saadaan seuraavanlainen taulukko:
+
+|indeksi | residuaali   |
+|--------|--------------|
+|97188   |  9693.771164 |
+|62042   |  9409.330132 |
+|61679   |  8977.055819 |
+|98993   |  8841.894667 |
+|121110  |  8235.446699 |
+|.....   | ......       |
+|107606  | -248.944002
+|109177  | -248.944018
+|109101  | -248.944018
+|109178  | -248.944018
+|109174  | -248.944018
+
+
+
+
+
+Name: sbytes, dtype: float64 
+
+### 10 PCA ja rekonstruktio
+
+Alla olevassa kaaviossa nähdään aineiston pääkomponenttianalyysi. Pisteet ovat väritetty aineiston todellisten label-arvojen mukaan, minkä avulla voimme havaita poikkeavien arvojen olevan pääasiassa oikeita anomalioita.
+![alt text](pca.png)
+
+|indeksi    | rekonstruktiohäviö    |label  |
+|-----------|-------------------    |-------|
+|20808      |    432.468236         |   0   |
+|20806      |    432.468171         |   0   |
+|18916      |    432.467972         |   0   |
+|23251      |    418.794315         |   0   |
+|99355      |    220.600355         |   1   |
+
+### 11 Satunnaisprojektiot
+
+UNSW-NB15 aineistossa on runsaasti piirteitä. Sarakkeita on 44 pl. indeksi, joista 42 on aitoja piirteitä. attack_cat ja label jätetään huomiotta. Dimensioiden pienentäminen voisi olla hyvä esikäsittely aineistolle, koska havaintoja on lähes 200 000 kappaletta ja piirteitä on lähes 50.
