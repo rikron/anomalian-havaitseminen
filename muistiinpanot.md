@@ -131,4 +131,57 @@ Alla olevassa kaaviossa nähdään aineiston pääkomponenttianalyysi. Pisteet o
 
 ### 11 Satunnaisprojektiot
 
-UNSW-NB15 aineistossa on runsaasti piirteitä. Sarakkeita on 44 pl. indeksi, joista 42 on aitoja piirteitä. attack_cat ja label jätetään huomiotta. Dimensioiden pienentäminen voisi olla hyvä esikäsittely aineistolle, koska havaintoja on lähes 200 000 kappaletta ja piirteitä on lähes 50.
+UNSW-NB15 aineistossa on runsaasti piirteitä. Sarakkeita on 44 pl. indeksi, joista 42 on aitoja piirteitä. attack_cat ja label jätetään huomiotta. Dimensioiden pienentäminen voisi olla hyvä esikäsittely aineistolle, koska havaintoja on lähes 200 000 kappaletta ja piirteitä on lähes 50. Skriptit kansiosta löytyvä satunnaisprojektio.py 
+
+### 12 Klusterointi ja tiheys
+
+Valitsemalla satunnaisesti noin 10000 havaintoa aineistosta pääkomponenttianalyysin jälkeen, voidaan havaita aineiston jakautuvan kolmeen ryhmään DBSCAN menetelmän avulla. Yksi havaintopiste tulkitaan kohinaksi. 
+![klusterointi](klusterointi.png)
+
+### 13 kNN ja paikallinen poikkeavuus
+
+Pääkomponenttianalyysin jälkeen aineistosta olisi hyvä selvittää Local Outlief Factor menetelmällä poikkeamia suhteessa havainnon omaan naapurustoon. DBSCAN klusterointi esitti datan jakautuvan 10000 havainnon satunnaisotannassa neljään ryhmään eps-arvolla 2. Lokaalit poikkeavuudet olisivat mielenkiintoisia tutkittavia. 
+
+Saamme lof poikkeavuusarvojen maksimeiksi 
+|           | lof poikkeavuusarvo
+|-----------|------------------------|
+|48868      |    2.406812e+09
+|49205      |    2.406812e+09
+|43587      |    1.040493e+09
+|43588      |    1.040493e+09
+|118337     |    8.287126e+08
+
+### 14 Vanhemmat kNN menetelmät
+
+### 15 Tukivektorikoneen periaatteet
+
+Normaalin alueen rajaaminen tukivektorikoneen ajatuksen avulla on mielekästä kyberturvallisuuden verkkoliikenteen analysoinnissa. Esikäsittelyn jälkeen dataa voisi tarkastella rajaamalla normaalin alueen rajapinta mielekkäästi. Koska aineistossa on label-arvot, helpottaa se rajauksen tekoa merkittävästi.
+
+### 16 One-class SVM
+
+Aineistosta on mahdollista valita normaaleja havaintoja label-arvojen avulla. Ilman suodattamista training data sisältää melko paljon tunnistettuja poikkeamia, jolloin one-class SVM voisi oppia väärän normaalin. Data on myös skaalattava tarkasti, jotta RBF-kernel ei mittaa etäisyyksiä väärin.
+
+### 17 Isolation forest
+
+Ajamalla Isolation forest -menetelmä aineistolle contamination arvolla 0.4, saadaan seuraavat havainnot suurimmiksi poikkeusarvoiksi:
+|indeksi |    poikkeavuusarvot
+|----------|-------------------
+
+80047           0.651327
+52761           0.622420
+103845          0.621750
+135921          0.617438
+153524          0.617438
+
+Listauksen suurimmat poikkeavuusarvot eroavat aiemmista mentelmistä. Käytännössä tähän vaikuttaa aineiston skaalaamattomuus sekä menetelmän poikkeavuuden korostamisen keino. 
+
+### 18 PyOD-työnkulku
+
+Ajamalla PyOD:n avulla LOF sekä IForest contamination arvoille 0.1, saadaan seuraavanlainen taulukko
+
+|          | LOF   | IForest |
+|----------|-------|---------|
+| parametri|n_neighbours|contamination|
+| top-5    |[157554 130063  46411 174961  97695]| [100451 103845  80047 112818  65761]|
+
+Tulkinta: Aineisto on niin laaja, että top-5 havaintojen päällekkäisyyksiä ei juurikaan tule. Samalla contamination arvolla ajetut menetelmät tuottavat runsaasti läheisiä tuloksia, minkä vuoksi pienessä otannassa päällekkäisyyksiä ei nähdä. Olisi suotavaa tutkia suuremman top-listan päällekkäisyyksiä tai ajaa menetelmät pienemmällä satunnaisotannalla.
