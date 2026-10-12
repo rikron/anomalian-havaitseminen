@@ -159,7 +159,7 @@ Normaalin alueen rajaaminen tukivektorikoneen ajatuksen avulla on mielekästä k
 
 ### 16 One-class SVM
 
-Aineistosta on mahdollista valita normaaleja havaintoja label-arvojen avulla. Ilman suodattamista training data sisältää melko paljon tunnistettuja poikkeamia, jolloin one-class SVM voisi oppia väärän normaalin. Data on myös skaalattava tarkasti, jotta RBF-kernel ei mittaa etäisyyksiä väärin.
+Aineistosta on mahdollista valita normaaleja havaintoja label-arvojen avulla. Ilman suodattamista training data sisältää melko paljon tunnistettuja poikkeamia, jolloin one-class SVM voisi oppia väärän normaalin. Data on myös skaalattava tarkasti, jotta RBF-kernel ei mittaa etäisyyksiä väärin. Käytännössä one-class svm ei sovi UNSW-NB15 aineistolle menetelmänä, sillä aineisto tulisi käytännössä suodattaa label-arvojen perusteella normaaliin ja poikkeavaan dataan. Verkkoliikenteessä normaali saattaa myös muuttua, mikä voi lisätä vääriä hälytyksiä entisestään. nu-parametri pyrkii sovittamaan rajalla olevia havaintoja normaaliksi tai poikkeamiksi. Käytännössä tämä vaikuttaa rajan pehmeyteen, jossa suurempi arvo vetää rajan tiukemmin. RBF-kernelin parametrina gamma vaikuttaa rajan tasaisuuteen. 
 
 ### 17 Isolation forest
 
@@ -173,7 +173,7 @@ Ajamalla Isolation forest -menetelmä aineistolle contamination arvolla 0.4, saa
 135921          0.617438
 153524          0.617438
 
-Listauksen suurimmat poikkeavuusarvot eroavat aiemmista mentelmistä. Käytännössä tähän vaikuttaa aineiston skaalaamattomuus sekä menetelmän poikkeavuuden korostamisen keino. 
+Listauksen suurimmat poikkeavuusarvot eroavat aiemmista menetelmistä. Käytännössä tähän vaikuttaa aineiston skaalaamattomuus sekä menetelmän poikkeavuuden korostamisen keino. 
 
 ### 18 PyOD-työnkulku
 
@@ -185,3 +185,22 @@ Ajamalla PyOD:n avulla LOF sekä IForest contamination arvoille 0.1, saadaan seu
 | top-5    |[157554 130063  46411 174961  97695]| [100451 103845  80047 112818  65761]|
 
 Tulkinta: Aineisto on niin laaja, että top-5 havaintojen päällekkäisyyksiä ei juurikaan tule. Samalla contamination arvolla ajetut menetelmät tuottavat runsaasti läheisiä tuloksia, minkä vuoksi pienessä otannassa päällekkäisyyksiä ei nähdä. Olisi suotavaa tutkia suuremman top-listan päällekkäisyyksiä tai ajaa menetelmät pienemmällä satunnaisotannalla.
+
+
+### 20 Autoenkooderit
+
+Aineisto on suuri ja numeerista esikäsittelyä on suoritettu. Autoenkooderi voisi toimia hyvin poikkeavuusarvona aineistolle. Vaikeuksia saattaisi ilmetä suuresta poikkeavien havaintojen määrästä koulutusaineistossa, jolloin autoenkooderi ei välttämättä osaa rekonstruoida normaalia dataa poikkeavaa dataa paremmin.
+
+Ajamalla autoenkooderi skripti, saadaan seuraavanlainen top 5 -lista:
+100451, 112818, 103845, 172965, 80047. Tämä lista on hyvin lähellä aiemmin ajettua Isolation Forest menetelmän tuottamaa listausta. Rekonstruktiohäviön jakauma on ääripäistä seuraavanlainen: 152.5  152.56 ... 20.62 21.62. Koska rekonstruktiohäviö on niin suuri, ei optimointia ole suoritettu mahdollisimman hyvin. Seuraavien ajojen aikana on parannettava optimointia.
+
+
+### 21 Aikasarja-anomaliat
+
+Aineistossa ei ole aikaulottuvuutta, sillä aineiston järjestys ei määräydy välttämättä ajan mukaan. Jos aineisto on aikajärjestyksessä, ei tapahtumien välistä aikaa ole tiedossa, minkä vuoksi datan aikavälejä on hankala tulkita. Koska aineisto on verkkoliikenteen loki, sen käsittely taulukkona 
+
+Aineisto on tavallinen taulukko, sillä datan järjestyksestä ei ole täyttä varmuutta, eikä aikaleimoja havainnoilla ole. Havaintoyksikkönä on yksi verkkoliikenteen lokimerkintä. Aineisto voi olla myös sekvenssiaineisto, sillä verkkoliikenne on hyvin usein järjestyksessä kirjattu. Tätä myös korostaa verkkoliikenteen peräkkäisten lokimerkintöjen samankaltaiset piirteet. 
+
+### 22 Transformer- ja embedding-ajattelu
+
+Embedding, attention ja transformer voivat olla aineistoon nähden melko raskaita suoritettavia olemassaolevilla resursseilla. Aiemmat menetelmät, kuten Isolation Forest tai neuroverkot ovat todennäköisesti yhtä hyödyllisiä tai hyödyllisempiä. Niiden selkeys on myös iso etu. 
