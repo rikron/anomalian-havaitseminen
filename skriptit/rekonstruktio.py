@@ -32,7 +32,6 @@ err = np.linalg.norm(X - X_reconstructed, axis=1)
 
 # Tehdään uusi dataframe, jonne yhdistetään labelit ja häviöt
 new_df = pd.DataFrame({
-    "indeksi": np.arange(len(err)),
     "rekonstruktiohäviö": err,
     "label": y.values})
 
@@ -44,11 +43,37 @@ new_df.to_csv('pca.csv')
 
 # Tehdään kuvio pääkomponenttianalyysistä. 
 plt.figure(figsize=(8,6))
-plt.scatter(X_pca[:, 0], 
-            X_pca[:, 1], 
-            c=y, 
-            cmap='coolwarm', 
-            edgecolor='k')
-plt.colorbar(label="label")
+
+normal = (y == 0)
+attack = (y == 1)
+
+# Normaalidata merkitään pallolla
+plt.scatter(X_pca[normal, 0],
+            X_pca[normal, 1],
+            c=err[normal],
+            cmap="viridis",
+            s=18,
+            alpha=0.8,
+            marker="o",
+            label="Normaali")
+
+# Hyökkäysdata merkitään rastilla
+plt.scatter(X_pca[attack, 0],
+            X_pca[attack, 1],
+            c=err[attack],
+            cmap="viridis",
+            s=18,
+            alpha=0.8,
+            marker="x",
+            label="Hyökkäys")
+
+plt.colorbar(label="rekonstruktiohäviö")
 plt.savefig("pca.png")
+plt.legend()
 plt.show()
+
+threshold_95 = np.percentile(err, 95)
+threshold_99 = np.percentile(err, 99)
+
+print(f"95. persentiilin kynnysarvo: {threshold_95:.6f}")
+print(f"99. persentiilin kynnysarvo: {threshold_99:.6f}")

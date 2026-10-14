@@ -19,8 +19,21 @@ X = df_train.astype(float)
 scaler = RobustScaler().fit(X)
 Xs = scaler.transform(X)
 
-hidden = 8,
-ae = MLPRegressor(hidden_layer_sizes=hidden, activation="tanh", max_iter=2000).fit(Xs[:10000], Xs[:10000])
+hidden = 16,
+ae = MLPRegressor(hidden_layer_sizes=hidden, activation="tanh", max_iter=4000).fit(Xs[:10000], Xs[:10000])
 recon = ae.predict(Xs)
 err = np.linalg.norm(Xs - recon, axis=1)
 print("hidden", hidden, "top5", np.argsort(err)[-5:][::-1].tolist(), "outlier-virheet", np.round(err[-2:], 2), "...", np.round(err[:2], 2))
+
+# Tehdään uusi dataframe, jonne yhdistetään labelit ja häviöt
+new_df = pd.DataFrame({
+    "rekonstruktiohäviö": np.round(err, 4),
+    "label": y.values})
+
+print(new_df.sort_values("rekonstruktiohäviö", ascending=False).head(10))
+
+threshold_95 = np.percentile(err, 95)
+threshold_99 = np.percentile(err, 99)
+
+print(f"95. persentiilin kynnysarvo: {threshold_95:.6f}")
+print(f"99. persentiilin kynnysarvo: {threshold_99:.6f}")

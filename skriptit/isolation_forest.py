@@ -19,8 +19,16 @@ model = IsolationForest(contamination=contamination).fit(df)
 pred = model.predict(df) == -1
 poikkeavuusarvot = -model.score_samples(df)
 
+df1 = pd.DataFrame({
+    "poikkeavuusarvot": poikkeavuusarvot,
+    "label": y.values})
 
-df1 = pd.DataFrame(poikkeavuusarvot, columns=['poikkeavuusarvot'])
 print("Maksimit:\n\n", df1.sort_values(ascending=False, by='poikkeavuusarvot').head(5))
 
 print(poikkeavuusarvot)
+
+threshold_95 = np.percentile(poikkeavuusarvot, 95)
+threshold_99 = np.percentile(poikkeavuusarvot, 99)
+
+print(f"95. persentiilin kynnysarvo: {threshold_95:.6f}")
+print(f"99. persentiilin kynnysarvo: {threshold_99:.6f}")
