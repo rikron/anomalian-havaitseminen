@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import precision_score, recall_score, f1_score, confusion_matrix
 
 df = pd.read_csv('aineisto/CSV Files/Training and Testing Sets/UNSW_NB15_training-set.csv');
 
@@ -33,13 +34,13 @@ err = np.linalg.norm(X - X_reconstructed, axis=1)
 # Tehdään uusi dataframe, jonne yhdistetään labelit ja häviöt
 new_df = pd.DataFrame({
     "rekonstruktiohäviö": err,
-    "label": y.values})
+    "label": y.values}, index=df.index+1)
 
 # Tulostetaan suurimmat rekonstruktiohäviöt
 print(new_df.sort_values("rekonstruktiohäviö", ascending=False).head(10))
 
 print(new_df.shape)
-new_df.to_csv('pca.csv')
+new_df.to_csv('csv/pca.csv')
 
 # Tehdään kuvio pääkomponenttianalyysistä. 
 plt.figure(figsize=(8,6))
@@ -68,12 +69,19 @@ plt.scatter(X_pca[attack, 0],
             label="Hyökkäys")
 
 plt.colorbar(label="rekonstruktiohäviö")
-plt.savefig("pca.png")
+plt.savefig("kuvat/pca.png")
 plt.legend()
 plt.show()
 
-threshold_95 = np.percentile(err, 95)
-threshold_99 = np.percentile(err, 99)
+# Arvioidaan menetelmää usealla eri kynnyksellä 
+thresholds = np.percentile(err, [40, 70, 80, 85, 90, 95, 99])
+y_true = (y == 1).astype(int)  
 
-print(f"95. persentiilin kynnysarvo: {threshold_95:.6f}")
-print(f"99. persentiilin kynnysarvo: {threshold_99:.6f}")
+print("kynnys   hälytykset     TP         FP         FN     precision  recall  F1")
+for tau in thresholds:
+    pred = (err >= tau).astype(int)
+    tn, fp, fn, tp = confusion_matrix(y_true, pred).ravel()
+    p = precision_score(y_true, pred, zero_division=0)
+    r = recall_score(y_true, pred, zero_division=0)
+    f1 = f1_score(y_true, pred, zero_division=0)
+    print(f"{tau:5.2f} {pred.sum():10d} {tp:10d} {fp:10d} {fn:10d} {p:10.2f} {r:7.2f} {f1:5.2f}")

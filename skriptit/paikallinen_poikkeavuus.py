@@ -6,11 +6,6 @@ from sklearn.decomposition import PCA
 
 df = pd.read_csv('aineisto/CSV Files/Training and Testing Sets/UNSW_NB15_training-set.csv');
 
-""" df = df.sample(
-    n=10000,
-    random_state=42
-) """
-
 # Pudotetaan valmiit label arvot ja id, label talteen
 y = df['label']
 df = df.drop(["id", "attack_cat", "label"], axis=1)
@@ -36,4 +31,4 @@ print("LOF top", int(np.argmax(lof_poikkeavuusarvot)), "LOF", np.round(lof_poikk
 
 df1 = pd.DataFrame(lof_poikkeavuusarvot, columns=['lof poikkeavuusarvo'])
 print("Maksimit:\n\n", df1.sort_values(ascending=False, by='lof poikkeavuusarvo').head(5))
-df1.to_csv('lof.csv')
+df1.to_csv('csv/lof.csv')

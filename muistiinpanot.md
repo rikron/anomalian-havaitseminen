@@ -7,7 +7,7 @@ Normaalia dataa voisi olla tavalliset verkkoliikenteen toiminnot, kuten käyttä
 
 ### 01 Mitä anomalia tarkoittaa
 
-Verkkoliikenteessä pisteanomalia saattaisi olla erikoinen ftp kirjautumisyritys tai suuri pakettimäärä. Kontekstuaalinen anomalia saattaisi taas olla useampi yllättävä ftp kirjautumisyritys etenkin, jos FTP ei ole käytössä kohdejärjestelmissä. Kollektiivisia anomalioita voi esiintyä verkkoliikenteen seassa, sillä aineistossa yksittäinen lokimerkintä ei saata itsessään nostaa hälytystä, kun taas kokoelma poikkeuksia voisi olla huomionarvoista. Tässä työssä käytämme termiä havainto yksittäisestä lokimerkinnästä.
+Verkkoliikenteessä pisteanomalia saattaisi olla erikoinen FTP-protokollan kirjautumisyritys tai suuri pakettimäärä. Kontekstuaalinen anomalia saattaisi taas olla useampi yllättävä FTP kirjautumisyritys etenkin, jos FTP ei ole käytössä kohdejärjestelmissä. Kollektiivisia anomalioita voi esiintyä verkkoliikenteen seassa, sillä aineistossa yksittäinen lokimerkintä ei saata itsessään nostaa hälytystä, kun taas kokoelma poikkeuksia voisi olla huomionarvoista. Tässä työssä käytämme termiä havainto yksittäisestä lokimerkinnästä.
 
 UNSW-SB15 aineiston havaintoyksikkö on verkkoliikennetapahtuma/lokimerkintä verkkoliikenteestä. Aineistossa normaalia käyttäytymistä voi olla toisinaan hankala erottaa anomaliasta ilman laajempaa kontekstia, mutta joitakin asioita kannattaa havaita: käytetty protokolla/palvelu ja kättelyvaihe, lähetysnopeus, lähetettyjen ja vastaanotettujen pakettien suuruus sekä määrä. Normaalisti näiden arvot ovat oletettujen arvojen sisällä, eikä esimerkiksi lähetettyjen tavujen määrä ole valtava. Eräs poikkeama voisi olla huomattavan suuri lähetettyjen tavujen määrä. Toinen poikkeama voisi olla liian tasaiset lukemat esimerkiksi lähetettyjen bittien lähetyskuormassa ja lähetysnopeudessa. Esimerkkinä tällaisesta havainnosta olisi lähetysnopeus (rate) 111111.1 ja vastaava lähetyskuorma (sload) 88888888. Koska aineistosta löytyy valmiit label-arvot, voidaan asetelmaksi ottaa alustavasti ohjattu anomalian havaitseminen. Aineistossa on runsaasti merkittyä poikkeamadataa, kuten myös normaalia käyttäytymistä.
 
@@ -81,7 +81,7 @@ Mahalanobis-etäisyyden kaava vertaa etäisyyttä aineiston pisteiden jakauman v
 
 Voimme hyödyntää arvioinnissa precision ja recall arvoja. Valmiit label-arvot tarjoavat mahdollisuuden laskea TP, TN, FP ja FN lukumäärät. 
 
-![accuracy, precision ja recall](image.png)
+![accuracy, precision ja recall](kuvat/image.png)
 Aineistosta löytyvät label-arvot toimivat erinomaisena työkaluna tulosten tarkastukseen. Binäärinen normaali/anomalia tilastointi voidaan toteuttaa melko luotettavasti. Accuracy ei ole aina luotettavin metriikka anomalian havaitsemisessa, sillä korkea accuracy saattaa silti sisältää kymmeniä tai satoja havaitsemattomia anomalioita. Tuloksia on tarkasteltava myös recall- ja,precision-arvojen  mukaisesti
 
 ### 08 Kynnys ja virheanalyysi
@@ -119,7 +119,7 @@ Name: sbytes, dtype: float64
 ### 10 PCA ja rekonstruktio
 
 Alla olevassa kaaviossa nähdään aineiston pääkomponenttianalyysi. Pisteet ovat väritetty aineiston todellisten label-arvojen mukaan, minkä avulla voimme havaita poikkeavien arvojen olevan pääasiassa oikeita anomalioita.
-![alt text](pca.png)
+![alt text](kuvat/pca.png)
 
 |indeksi    | rekonstruktiohäviö    |label  |
 |-----------|-------------------    |-------|
@@ -131,12 +131,12 @@ Alla olevassa kaaviossa nähdään aineiston pääkomponenttianalyysi. Pisteet o
 
 ### 11 Satunnaisprojektiot
 
-UNSW-NB15 aineistossa on runsaasti piirteitä. Sarakkeita on 44 pl. indeksi, joista 42 on aitoja piirteitä. attack_cat ja label jätetään huomiotta. Dimensioiden pienentäminen voisi olla hyvä esikäsittely aineistolle, koska havaintoja on lähes 200 000 kappaletta ja piirteitä on lähes 50. Skriptit kansiosta löytyvä satunnaisprojektio.py 
+UNSW-NB15 aineistossa on runsaasti piirteitä. Sarakkeita on 44 pl. indeksi, joista 42 on aitoja piirteitä. attack_cat ja label jätetään huomiotta. Dimensioiden pienentäminen voisi olla hyvä esikäsittely aineistolle, koska havaintoja on lähes 200 000 kappaletta ja piirteitä on lähes 50.
 
 ### 12 Klusterointi ja tiheys
 
 Valitsemalla satunnaisesti noin 10000 havaintoa aineistosta pääkomponenttianalyysin jälkeen, voidaan havaita aineiston jakautuvan kolmeen ryhmään DBSCAN menetelmän avulla. Yksi havaintopiste tulkitaan kohinaksi. 
-![klusterointi](klusterointi.png)
+![klusterointi](kuvat/klusterointi.png)
 
 ### 13 kNN ja paikallinen poikkeavuus
 

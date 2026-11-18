@@ -18,4 +18,4 @@ df = pd.DataFrame(df, None, columns=columns)
 
 """CSV tiedostoksi muunnettu taulukko"""
 print(df)
-df.to_csv('skaalattu.csv', index=False)
+df.to_csv('csv/skaalattu.csv', index=False)

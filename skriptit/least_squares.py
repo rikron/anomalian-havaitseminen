@@ -18,4 +18,4 @@ print("")
 print("Maksimit:\n\n", residual.sort_values(ascending=False).head(5))
 
 df = pd.DataFrame(residual, None)
-df.to_csv('least_squares.csv')
+df.to_csv('csv/least_squares.csv')
